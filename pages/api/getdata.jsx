@@ -106,9 +106,6 @@ export default async function Fetch(req, res) {
     // const dataInJson = [];
     let allUrls = await connect();
 
-    if (allUrls) {
-
-    }
     // let allUrlsLength = allUrls.length;
     // console.log(allUrls)
 
