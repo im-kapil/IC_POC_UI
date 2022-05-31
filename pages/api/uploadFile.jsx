@@ -11,7 +11,6 @@ const { FindCursor, MongoClient } = require("mongodb");
 require('dotenv').config();
 
 
-
 async function uploadFile() {
 
     const directoryPath = path.join('./uploads');
@@ -27,7 +26,6 @@ async function uploadFile() {
             // Do whatever you want to do with the file
             console.log("/uploads/" + file);
         });
-
 
         function getAccessToken() {
             // If you're just testing, you can paste in a token
@@ -64,26 +62,26 @@ async function uploadFile() {
 
             const cid = await storage.put(await getFilesFromPath("uploads/" + filePath), { wrapWithDirectory: false })
 
-            class Connection{
-              async connect(){
-                  return await MongoClient.connect(process.env.ORDERIFIC_DB_URI, {
-                  useNewUrlParser: true,
-                })
-              }
+            class Connection {
+                async connect() {
+                    return await MongoClient.connect(process.env.ORDERIFIC_DB_URI, {
+                        useNewUrlParser: true,
+                    })
+                }
             }
 
             const connectionObj = new Connection();
             const connection = await connectionObj.connect();
             const orderificDB = connection.db(process.env.ORDERIFIC_DB);
             try {
-              const myCollection = orderificDB.collection('orderific_cid_collection');
-              const data = {
-                cid: cid,
-              }
-              const result = await myCollection.insertOne(data);
+                const myCollection = orderificDB.collection('orderific_cid_collection');
+                const data = {
+                    cid: cid,
+                }
+                const result = await myCollection.insertOne(data);
             }
             finally {
-              await connection.close();
+                await connection.close();
             }
             console.log('Content added with CID:', cid)
 
@@ -96,8 +94,11 @@ async function uploadFile() {
 
     });
 
-}
+    setTimeout(() => {
+        fsExtra.emptyDirSync("./uploads/")
+    }, 300000);
 
+}
 
 const upload = multer({
     storage: multer.diskStorage({
