@@ -56,22 +56,22 @@ export default async function connect(req, res) {
         allCids.push(allContentIdentifiers[i].cid)
     }
     console.log("Length of All CID", allCids.length)
-    const client = makeStorageClient()
+    // const client = makeStorageClient()
     const allCidsLength = allCids.length;
     const allUrls = [];
 
     for (let k = 0; k < allCidsLength; k++) {
-        const res = await client.get(allCids[k])
-        if (!res.ok) {
-            throw new Error(`failed to get ${cid}`)
-        }
-        const files = await res.files()
-        let file;
-        for (file of files) {
+        // const res = await client.get(allCids[k])
+        // if (!res.ok) {
+        //     // throw new Error(`failed to get ${cid}`)
+        // }
+        // const files = await res.files()
+        // let file;
+        // for (file of files) {
             //  console.log(`${file.cid} -- ${file.name} -- ${file.size}`)
-        }
-        console.log("https://" + allCids[k] + ".ipfs.dweb.link/" + file.name)
-        allUrls.push("https://" + allCids[k] + ".ipfs.dweb.link/" + file.name)
+        // }
+        console.log("https://" + allCids[k] + ".ipfs.dweb.link/")
+        allUrls.push("https://" + allCids[k] + ".ipfs.dweb.link/")
     }
 
     res.json(allUrls)
