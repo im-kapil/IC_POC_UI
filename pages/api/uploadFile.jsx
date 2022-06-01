@@ -91,7 +91,6 @@ async function uploadFile() {
         }
 
         uploadFiles(files)
-
     });
 
     setTimeout(() => {
@@ -116,13 +115,14 @@ const apiRoute = nextConnect({
     onNoMatch(req, res) {
         res.status(405).json({ error: `Method '${req.method}' Not Allowed` });
     },
+    
 });
 
-apiRoute.use(upload.array('file'));
+apiRoute.use(upload.single('file'));
 
 apiRoute.post((req, res) => {
-    uploadFile()
-    res.status(200).json({ data: 'success' });
+    // uploadFile()
+    // res.status(200).json({ data: 'success' });
 });
 console.log("Hello Wolrd")
 

@@ -1,25 +1,27 @@
+// pages/api/hello.js
+import nc from "next-connect";
 
-import nextConnect from 'next-connect';
-import multer from 'multer';
-const path = require('path');
-const fs = require('fs');
+const handler = nc({
+  onError: (err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).end("Something broke!");
+  },
+  onNoMatch: (req, res) => {
+    res.status(404).end("Page is not found");
+  },
+})
+  .use(someMiddleware())
+  .get((req, res) => {
+    res.send("Hello world");
+  })
+  .post((req, res) => {
+    res.json({ hello: "world" });
+  })
+  .put(async (req, res) => {
+    res.end("async/await is also supported!");
+  })
+  .patch(async (req, res) => {
+    throw new Error("Throws me around! Error can be caught and handled.");
+  });
 
-export default async function handler(req, res){
-
-    const directoryPath = path.join('./public/uploads');
-//passsing directoryPath and callback function
-fs.readdir(directoryPath, function (err, files) {
-    //handling error
-    if (err) {
-        return console.log('Unable to scan directory: ' + err);
-    } 
-    //listing all files using forEach
-    files.forEach(function (file) {
-        // Do whatever you want to do with the file
-        console.log("/public/uploads/"+file); 
-    });
-});
-
-res.json("good")
-
-}
+export default handler;
