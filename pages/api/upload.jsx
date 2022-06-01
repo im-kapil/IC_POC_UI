@@ -5,67 +5,16 @@ const { Web3Storage, getFilesFromPath } = require('web3.storage');
 const fsExtra = require('fs-extra');
 require('dotenv').config();
 
-class Connection {
-    async connect() {
-        return await MongoClient.connect(process.env.ORDERIFIC_DB_URI, {
-            useNewUrlParser: true,
-        })
-    }
-}
+// class Connection {
+//     async connect() {
+//         return await MongoClient.connect(process.env.ORDERIFIC_DB_URI, {
+//             useNewUrlParser: true,
+//         })
+//     }
+// }
 
-async function uploadFileToDB(fileName) {
-    const connectionObj = new Connection();
-    const connection = await connectionObj.connect();
-    const orderificDB = connection.db(process.env.ORDERIFIC_DB);
-    try {
-        const myCollection = orderificDB.collection('filename_collection');
-        const data = {
-            fileName: fileName,
-        }
-        const result = await myCollection.insertOne(data);
-    }
-    catch (e) {
-        console.log(e);
-        return e;
-    }
-    finally {
-        await connection.close();
-    }
-    return "FileName Insrted To DB"
-}
-
-async function uploadFileToDecentralizedStorage() {
-    const connectionObj = new Connection();
-    const connection = await connectionObj.connect();
-    const orderificDB = connection.db(process.env.ORDERIFIC_DB);
-    try {
-        const myCollection = orderificDB.collection('filename_collection');
-        const result = await myCollection.find();
-        const allFiles = await result.toArray()
-        const length = allFiles.length;
-        console.log("Length", length)
-        for (let i = 0; i < length; i++) {
-            //  console.log("I", i);
-            //  console.log(allFiles[i].fileName);
-            if (i == length - 1) {
-                // console.log(allFiles[i].fileName);
-                return allFiles[i].fileName
-            }
-        }
-
-    }
-    catch (e) {
-        console.log(e);
-        return e;
-    }
-    finally {
-        await connection.close();
-    }
-}
-
-async function finalUploadToDecentralizedStorage() {
-    const fileName = await uploadFileToDecentralizedStorage()
-    console.log("Res from function", fileName);
+async function uploadFileToDecentralizedStorage(fileName) {
+    console.log("File Name", fileName);
 
     function getAccessToken() {
         // If you're just testing, you can paste in a token
@@ -92,31 +41,30 @@ async function finalUploadToDecentralizedStorage() {
     }
 
     const storage = new Web3Storage({ token })
-    console.log("Returning Filepath");
     const filepath = await getFilesFromPath("uploads/" + fileName);
-    console.log("YOur File Path Isnde the Upload Function", filepath);
+    console.log("Your File", filepath);
 
-    console.log(`Uploading your files`)
+    console.log(`Uploading your file`)
 
     const cid = await storage.put(await getFilesFromPath("uploads/" + fileName), { wrapWithDirectory: false })
     console.log("File Uploaded Successfull", cid);
 
-    const connectionObj = new Connection();
-    const connection = await connectionObj.connect();
-    const orderificDB = connection.db(process.env.ORDERIFIC_DB);
-    try {
-        const myCollection = orderificDB.collection('orderific_cid_collection');
-        const data = {
-            cid: cid,
-        }
-        const result = await myCollection.insertOne(data);
-    }
-    catch(e){
-        return e;
-    }
-    finally {
-        await connection.close();
-    }
+    // const connectionObj = new Connection();
+    // const connection = await connectionObj.connect();
+    // const orderificDB = connection.db(process.env.ORDERIFIC_DB);
+    // try {
+    //     const myCollection = orderificDB.collection('orderific_cid_collection');
+    //     const data = {
+    //         cid: cid,
+    //     }
+    //     const result = await myCollection.insertOne(data);
+    // }
+    // catch(e){
+    //     return e;
+    // }
+    // finally {
+    //     await connection.close();
+    // }
 
   return cid
 }
@@ -143,9 +91,7 @@ const apiRoute = nextConnect({
 apiRoute.use(upload.single('file'));
 
 apiRoute.post(async (req, res) => {
-    await uploadFileToDB(req.file.originalname)
-    // console.log(status)
-    let cid = await finalUploadToDecentralizedStorage();
+    let cid = await uploadFileToDecentralizedStorage(req.file.originalname);
     if(cid){
         fsExtra.emptyDirSync("./uploads/")
     }
