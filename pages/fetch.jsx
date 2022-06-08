@@ -8,7 +8,7 @@ const fetcher = (url) => axios.get(url).then(response => response.data);
 
 export default function Fetch() {
 
-  const { data, error } = useSWR(__dirname+"api/getdata", fetcher)
+  const { data, error } = useSWR("api/getCentralizedData", fetcher)
 
   if (error) {
     return (<p>{error.message}</p>)
